@@ -5,6 +5,8 @@ from django.contrib.auth import login, authenticate, logout
 from accounts.forms import LoginForm, RegisterForm
 from django.views.generic.edit import View
 from bank_account.models import CurrencyRelation
+from django.views.generic.edit import View
+from bank_account.models import CurrencyRelation
 from hashlib import sha256
 import hmac
 from accounts.utils import verify_telegram_authentication
@@ -44,10 +46,7 @@ def sign_up(request):
             return redirect('register_telegram')
         else:
             return render(request, 'users/register.html', {'form': form})
-<<<<<<< HEAD
 
-=======
->>>>>>> 875041e784795f3c0cb40da964d3d7b7712ab0a4
 
 
 def sign_up_telegram(request):
@@ -71,9 +70,6 @@ def sign_in(request):
     if request.method == 'GET':
         if request.user.is_authenticated:
             return redirect('index')
-<<<<<<< HEAD
-
-=======
         
         if request.GET.get('hash'):
             if verify_telegram_authentication(TELEGRAM_BOT_TOKEN, request.GET):
@@ -84,8 +80,7 @@ def sign_in(request):
                     login(request, user)
                     messages.success(request,f'Hi {user.first_name}, welcome back!')
                     return redirect('index')
-        
->>>>>>> 875041e784795f3c0cb40da964d3d7b7712ab0a4
+
         form = LoginForm()
         return render(request, 'users/login.html', {'form': form})
 
@@ -99,11 +94,6 @@ def sign_in(request):
             if user:
                 login(request, user)
                 return redirect('index')
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> 875041e784795f3c0cb40da964d3d7b7712ab0a4
         # either form not valid or user is not authenticated
         messages.error(request, f'Invalid username or password')
         return render(request, 'users/login.html', {'form': form})
