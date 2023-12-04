@@ -13,11 +13,27 @@
   		{% if request.user.is_authenticated %}
   			<span>Hi {{ request.user.username | title }}</span>
   			<a href="{% url 'logout' %}">Logout</a>
+            <a href="{% url 'bank-account' %}">Your bank accounts</a>
   		{% else %}
   			<a href="{% url 'login' %}">Login</a>
   			<a href="{% url 'register' %}">Register</a>
   		{% endif %}
   	</header>
+    <h1>Текущий курс валют</h1>
+    <table>
+        <tr>
+            <th>Валюта</th>
+            <th>Курс покупки</th>
+            <th>Курс продажи</th>
+        </tr>
+        {% for currency_relation in currency_relations %}
+        <tr>
+            <td>{{ currency_relation.currency_from }}\{{ currency_relation.currency_to }}</td>
+            <td>{{ currency_relation.coefficient_buy }}</td>
+            <td>{{ currency_relation.coefficient_sell }}</td>
+        </tr>
+        {% endfor %}
+    </table>
   	<main>
 	  	{% if messages %}
 			<div class="messages">

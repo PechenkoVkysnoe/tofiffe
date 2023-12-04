@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  	<header>
+        <a href="{% url 'make-bank-account' %}">Make new bank account</a>
+        <a href="{% url 'make-credit-card' %}">Make new credit card</a>
+  	</header>
+
+  	<!-- Displaying bank account details -->
+  	{% for bank_account in bank_accounts %}
+  	    <div>
+  	        <p>Account: {{ bank_account.name }}</p>
+  	        <p>Balance: {{ bank_account.balance }}</p>
+  	        <p>Currency: {{ bank_account.currency }}</p>
+  	    </div>
+  	{% endfor %}
+    {% for credit_card in credit_cards %}
+  	    <div>
+            <p>Number: {{ credit_card.number }}</p>
+  	        <p>Owner name: {{ credit_card.owner_name }}</p>
+  	        <p>Date: {{ credit_card.date_to }}</p>
+  	        <p>Cvv: {{ credit_card.cvv }}</p>
+            <p>Bank account: {{ credit_card.bank_account }}</p>
+  	    </div>
+  	{% endfor %}
+</body>
+</html>

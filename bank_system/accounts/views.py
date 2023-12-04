@@ -1,17 +1,25 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from accounts.forms import LoginForm, RegisterForm
+from django.views.generic.edit import View
+from bank_account.models import CurrencyRelation
 
+class Index(View):
+    def get(self, request, *args, **kwargs):
+        currency_relations = CurrencyRelation.objects.all()
+        context = {
+            'currency_relations': currency_relations
+        }
+        return render(request, 'users/index.html', context=context)
 
-def index(request):
-    return render(request, 'users/index.html')
 
 def sign_up(request):
     if request.method == 'GET':
         form = RegisterForm()
-        return render(request, 'users/register.html', {'form': form})    
-   
+        return render(request, 'users/register.html', {'form': form})
+
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -23,34 +31,36 @@ def sign_up(request):
             return redirect('index')
         else:
             return render(request, 'users/register.html', {'form': form})
-        
+
 
 def sign_in(request):
     if request.method == 'GET':
         if request.user.is_authenticated:
             return redirect('index')
-        
+
         form = LoginForm()
-        return render(request,'users/login.html', {'form': form})
-    
+        return render(request, 'users/login.html', {'form': form})
+
     elif request.method == 'POST':
         form = LoginForm(request.POST)
-        
+
         if form.is_valid():
             username = form.cleaned_data['username']
-            password=form.cleaned_data['password']
-            user = authenticate(request,username=username,password=password)
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
             if user:
                 login(request, user)
-                messages.success(request,f'Hi {username.title()}, welcome back!')
                 return redirect('index')
-	
+
         # either form not valid or user is not authenticated
-        messages.error(request,f'Invalid username or password')
-        return render(request,'users/login.html',{'form': form})
+        messages.error(request, f'Invalid username or password')
+        return render(request, 'users/login.html', {'form': form})
 
 
 def sign_out(request):
     logout(request)
-    messages.success(request,f'You have been logged out.')
-    return redirect('login')     
+    messages.success(request, f'You have been logged out.')
+    return redirect('login')
+
+
+
