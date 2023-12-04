@@ -1,9 +1,14 @@
 """
 Telegram login authentication functionality.
 """
+from functools import wraps
 import hashlib
 import hmac
 import time
+from django.shortcuts import redirect
+from django.views.generic.edit import View
+from django.contrib.auth.mixins import AccessMixin
+
 
 
 ONE_DAY_IN_SECONDS = 86400
@@ -45,3 +50,22 @@ def verify_telegram_authentication(bot_token, request_data) -> bool:
         return False
 
     return True
+
+           
+class LoginConfirmedRequiredMixin(AccessMixin):
+    """Verify that the current user is authenticated, telegram is connected and ."""
+
+    def dispatch(self, request, *args, **kwargs):
+
+        if request.user.is_authenticated:
+            if request.user.telegram_id != 0:
+                if request.user.confirmed:
+                    return super().dispatch(request, *args, **kwargs)
+                else:
+                    self.redirect_field_name = "await_confirm"
+            else:
+                self.redirect_field_name = "register_telegram"
+        else:
+            self.redirect_field_name = "login"
+        
+        return self.handle_no_permission()

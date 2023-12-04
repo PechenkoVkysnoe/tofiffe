@@ -8,12 +8,15 @@
   </head>
   <body>
   	<header>
-  		{% if request.user.is_authenticated %}
+  		{% if request.user.is_authenticated and request.user.telegram_id != 0 and request.user.confirmed %}
   			<span>Hi {{ request.user.username | title }}</span>
   			<a href="{% url 'logout' %}">Logout</a>
             <a href="{% url 'bank-account' %}">Your bank accounts</a>
-  		{% else %}
-  			<a href="{% url 'login' %}">Login</a>
+  		{% elif request.user.is_authenticated %}
+		  	<span>Hi {{ request.user.username | title }}. Please, verify your identity.</span>
+			<a href="{% url 'logout' %}">Logout</a>
+		{% else %}
+			<a href="{% url 'login' %}">Login</a>
   			<a href="{% url 'register' %}">Register</a>
   		{% endif %}
   	</header>

@@ -7,9 +7,10 @@ from bank_account.forms import MakeBankAccountForm, MakeCreditCardForm
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, View
 from bank_account.models import BankAccount, CreditCard
+from accounts.utils import LoginConfirmedRequiredMixin
 
 
-class BankAccountView(View):
+class BankAccountView(LoginConfirmedRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         bank_accounts = BankAccount.objects.filter(user=request.user)
         credit_cards = CreditCard.objects.filter(bank_account__user=request.user)
@@ -20,7 +21,7 @@ class BankAccountView(View):
         return render(request, 'bank_account/base.html', context)
 
 
-class MakeBankAccount(LoginRequiredMixin, CreateView):
+class MakeBankAccount(LoginConfirmedRequiredMixin, CreateView):
     model = BankAccount
     form_class = MakeBankAccountForm
     success_url = reverse_lazy('bank-account')
@@ -32,7 +33,7 @@ class MakeBankAccount(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class MakeCreditCard(LoginRequiredMixin, CreateView):
+class MakeCreditCard(LoginConfirmedRequiredMixin, CreateView):
     model = CreditCard
     form_class = MakeCreditCardForm
     success_url = reverse_lazy('bank-account')
