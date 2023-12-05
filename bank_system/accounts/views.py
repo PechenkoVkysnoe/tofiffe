@@ -1,3 +1,4 @@
+from functools import wraps
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -5,7 +6,6 @@ from django.contrib.auth import login, authenticate, logout
 from accounts.forms import LoginForm, RegisterForm
 from django.views.generic.edit import View
 from bank_account.models import CurrencyRelation
-from django.views.generic.edit import View
 from bank_account.models import CurrencyRelation
 from hashlib import sha256
 import hmac
@@ -15,10 +15,15 @@ from accounts.models import User
 TELEGRAM_BOT_TOKEN = '6510492757:AAGSxkG85ynW3C4EFN0bKjIvFedE_0kIKRE'
 
 
+
 class Index(View):
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated and request.user.telegram_id == 0:
-            return redirect('register_telegram')
+        if request.user.is_authenticated:
+            if request.user.telegram_id == 0:
+                return redirect('register_telegram')
+            if not request.user.confirmed:
+                return redirect('await_confirm')
+            
         currency_relations = CurrencyRelation.objects.all()
         context = {
             'currency_relations': currency_relations
@@ -51,19 +56,24 @@ def sign_up(request):
 
 def sign_up_telegram(request):
     if request.method == 'GET':
-        if request.user and request.user.telegram_id == 0:
-            if request.GET.get('hash'):
-                if verify_telegram_authentication(TELEGRAM_BOT_TOKEN, request.GET):
-                    user = User.objects.filter(id=request.user.id)
+        if request.user.is_authenticated:
+            if request.user.telegram_id == 0:
+                if request.GET.get('hash'):
+                    if verify_telegram_authentication(TELEGRAM_BOT_TOKEN, request.GET):
+                        user = User.objects.filter(id=request.user.id)
 
-                    if user:
-                        user = user[0]
-                        user.telegram_id = int(request.GET.get('id')) 
-                        user.save()
-                        messages.success(request,f'Telegram id successfully linked!')
-                        return redirect('index')
-
-            return render(request, 'users/register_telegram.html')
+                        if user:
+                            user = user[0]
+                            user.telegram_id = int(request.GET.get('id')) 
+                            user.save()
+                            messages.success(request,f'Telegram id successfully linked!')
+                            return redirect('index')
+                        
+                return render(request, 'users/register_telegram.html')
+            else:
+                return redirect("index")
+        else:
+            return redirect("login")
 
     
 def sign_in(request):
@@ -105,4 +115,13 @@ def sign_out(request):
     return redirect('login')
 
 
-
+class AwaitConfirm(View):
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("login")
+        else:
+            if request.user.telegram_id == 0:
+                return redirect("register_telegram")
+            if request.user.confirmed:
+                return redirect("index")
+        return render(request, 'users/await_confirm.html')
