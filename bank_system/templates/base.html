@@ -11,10 +11,12 @@
   		{% if request.user.is_authenticated %}
   			<span>Hi {{ request.user.username | title }}</span>
   			<a href="{% url 'logout' %}">Logout</a>
-            <a href="{% url 'bank-account' %}">Your bank accounts</a>
+            <a href="{% url 'bank-account' %}">Your cabinet</a>
+            <a href="{% url 'about_us' %}">О нас</a>
   		{% else %}
   			<a href="{% url 'login' %}">Login</a>
   			<a href="{% url 'register' %}">Register</a>
+            <a href="{% url 'about_us' %}">О нас</a>
   		{% endif %}
   	</header>
     <h1>Текущий курс валют</h1>

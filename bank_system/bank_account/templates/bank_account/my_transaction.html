@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank bank</title>
+</head>
+<body>
+    <a href="{% url 'bank-account' %}">Go back to the cabinet</a>
+    <br>
+    <a href="{% url 'make-transaction' %}">Make new transaction between credit card</a>
+    <br>
+    <p>Your transaction</p>
+    <br>
+    {% for transaction in transactions %}
+  	    <div>
+            <p>Date: {{ transaction.dt }}</p>
+  	        <p>Type of transaction: {{ transaction.transaction_type }}</p>
+  	        <p>Value: {{ transaction.value }}</p>
+  	        <p>From: {{ transaction.credit_card_from }}</p>
+            <p>To: {{ transaction.credit_card_to }}</p>
+            <p>Transaction status: {{ transaction.transaction_status }}</p>
+  	    </div>
+        <br>
+  	{% endfor %}
+</body>
+</html>

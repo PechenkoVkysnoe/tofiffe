@@ -39,7 +39,7 @@ class BankAccountType(models.Model):
 
 
 class BankAccount(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     balance = models.DecimalField(
         default=0,
@@ -68,6 +68,9 @@ class CreditCard(models.Model):
     cvv = models.IntegerField()
     card_type = models.ForeignKey(CreditCardType, on_delete=models.CASCADE)
     bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.number
 
 
 class BankPartner(models.Model):
