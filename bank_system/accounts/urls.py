@@ -9,6 +9,6 @@ urlpatterns = [
     path('register/', views.sign_up, name='register'),
 	path('register/telegram', views.sign_up_telegram, name='register_telegram'),
     path('pather', PartnerView.as_view(), name='partner'),
-    path('about_us', AboutUsView.as_view(), name='about_us')
+    path('about_us', AboutUsView.as_view(), name='about_us'),
 	path('await_confirm/', views.AwaitConfirm.as_view(), name='await_confirm')
 ]
