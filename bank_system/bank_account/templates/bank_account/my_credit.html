@@ -3,24 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <title>Bank bank</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        header {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px;
+        }
+
+        header a {
+            text-decoration: none;
+            color: #000;
+            padding: 10px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+
+        header a:hover {
+            background-color: #f2f2f2;
+        }
+
+    </style>
 </head>
 <body>
-    <a href="{% url 'bank-account' %}">Go back to the cabinet</a>
+<header>
+    <a href="{% url 'bank-account' %}">Вернуться в личный кабинет</a>
+    <a href="{% url 'make-credit' %}">Создать заявку на кредит</a>
+    <a href="{% url 'pay-credit' %}">Оплатить свои кредиты</a>
+</header>
+<div style="margin: 10px">
+
+    <p>Ваши кредиты</p>
+    <table>
+        <tr>
+            <th>Кредит</th>
+            <th>Банковский аккаунт</th>
+            <th>Статус</th>
+            <th>Сумма</th>
+            <th>Период в месяцах</th>
+            <th>Процент в год</th>
+            <th>История кредита</th>
+            <th>Оплата кредита</th>
+        </tr>
+        {% for credit in credits %}
+            <tr>
+                <td>{{ credit.credit }}</td>
+                <td>{{ credit.bank_account }}</td>
+                <td>{{ credit.status }}</td>
+                <td>{{ credit.amount }}</td>
+                <td>{{ credit.credit.period_in_month }}</td>
+                <td>{{ credit.credit.percent }}</td>
+                {% if credit.status.name == 'Одобрено' %}
+                    <td><a href="{% url 'credit-history' id=credit.id %}">Туть</a></td>
+                {% else %}
+                    <td>Ожидайте подтверждения кредита</td>
+                {% endif %}
+                {% if credit.status.name == 'Одобрено' %}
+                    <td><a href="{% url 'pay-credit' %}">Туть</a></td>
+                {% else %}
+                    <td>Ожидайте подтверждения кредита</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
     <br>
-    <a href="{% url 'make-credit' %}">Make new application for a credit</a>
-    <br>
-    <p>Your credits</p>
-    <br>
-    {% for credit in credits %}
-  	    <div>
-            <p>credit: {{ credit.credit }}</p>
-  	        <p>Bank account: {{ credit.bank_account }}</p>
-  	        <p>Status: {{ credit.status }}</p>
-  	        <p>Amount: {{ credit.amount }}</p>
-            <p>Period in month: {{ credit.credit.period_in_month }}</p>
-            <p>Percent at year: {{ credit.credit.percent }}</p>
-  	    </div>
-        <br>
-  	{% endfor %}
+</div>
 </body>
 </html>

@@ -3,22 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <title>Bank bank</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px;
+        }
+
+        header a {
+            text-decoration: none;
+            color: #000;
+            padding: 10px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+
+        header a:hover {
+            background-color: #f2f2f2;
+        }
+
+        .popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            background-color: white;
+            border: 1px solid black;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a box shadow for a more prominent look */
+            border-radius: 5px;
+        }
+
+        .close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <a href="{% url 'bank-account' %}">Go back to the cabinet</a>
-    <p>Your credit cards</p>
+<header>
+    <a href="{% url 'bank-account' %}">Вернуться в личный кабинет</a>
     <br>
-    {% for credit_card in credit_cards %}
-  	    <div>
-            <p>Number: {{ credit_card.number }}</p>
-  	        <p>Owner name: {{ credit_card.owner_name }}</p>
-  	        <p>Date: {{ credit_card.date_to }}</p>
-  	        <p>Cvv: {{ credit_card.cvv }}</p>
-            <p>Bank account: {{ credit_card.bank_account }}</p>
-  	    </div>
-        <br>
-  	{% endfor %}
+    <a href="{% url 'make-credit-card' %}">Создать новую кредитную карту</a>
+</header>
+<div style="margin: 10px">
 
-    <a href="{% url 'make-credit-card' %}">Make new credit card</a>
+    <p>Ваши банковские карты</p>
+    <table>
+        <tr>
+            <th>Номер</th>
+            <th>Имя владельца</th>
+            <th>Срок действия</th>
+            <th>Cvv</th>
+            <th>Банковский аккаунт</th>
+            <th>Баланс</th>
+            <th>Валюта</th>
+            <th>Тип</th>
+            <th>Транзакции</th>
+        </tr>
+        {% for credit_card in credit_cards %}
+            <tr>
+                <td>{{ credit_card.number }}</td>
+                <td>{{ credit_card.owner_name }}</td>
+                <td>{{ credit_card.date_to }}</td>
+                <td>{{ credit_card.cvv }}</td>
+                <td>{{ credit_card.bank_account }}</td>
+                <td>{{ credit_card.bank_account.balance }}</td>
+                <td>{{ credit_card.bank_account.currency }}</td>
+                <td>{{ credit_card.card_type }}</td>
+                <td><a href="{% url 'cart-transaction' number=credit_card.number %}">Ваши транзакции</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br>
+</div>
+{% if messages %}
+
+    {% for message in messages %}
+        <div class="popup">
+            <span class="close">&times;</span>
+            <p>{{ message }}</p>
+        </div>
+
+        <script>
+            var closeBtn = document.querySelector('.close');
+            var popup = document.querySelector('.popup');
+
+            closeBtn.addEventListener('click', function () {
+                popup.style.display = 'none';
+            });
+        </script>
+    {% endfor %}
+{% endif %}
+
 </body>
 </html>

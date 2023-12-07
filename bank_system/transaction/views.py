@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
@@ -9,6 +10,8 @@ from bank_account.models import CreditCard, CurrencyRelation
 from transaction.models import Transaction, TransactionStatus, TransactionType
 
 from transaction.forms import MoneyTransferForm
+
+from bank_account.models import BankAccountType
 
 
 class MoneyTransferView(LoginRequiredMixin, CreateView):
@@ -21,7 +24,16 @@ class MoneyTransferView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         credit_card_from = form.cleaned_data['credit_card_from']
         credit_card_to = CreditCard.objects.filter(number=form.cleaned_data['credit_card_to']).first()
-
+        if credit_card_from.bank_account.account_type == BankAccountType.objects.filter(type='Сберегательный').first():
+            form.instance.dt = datetime.datetime.now()
+            form.instance.transaction_type = TransactionType.objects.get(type='Перевод')
+            form.instance.value = form.cleaned_data['value']
+            form.instance.credit_card_from = form.cleaned_data['credit_card_from']
+            form.instance.credit_card_to = credit_card_to
+            form.instance.transaction_status = TransactionStatus.objects.get(type='Нельзя переводить с сберегательного счета')
+            messages.success(self.request, "Нельзя переводить с сберегательного счета!")
+            return super().form_valid(form)
+        coef = 1
         if credit_card_from.bank_account.currency == credit_card_to.bank_account.currency:
             # если одинаковые валюты
             coef = 1
@@ -40,7 +52,16 @@ class MoneyTransferView(LoginRequiredMixin, CreateView):
 
             if currency_relation is None:
                 # если такого обмена нет
-                transaction_status = TransactionStatus.objects.get(type='нельзя конвертировать валюты')
+                transaction_status = TransactionStatus.objects.get(type='Нельзя конвертировать данные валюты')
+
+                form.instance.dt = datetime.datetime.now()
+                form.instance.transaction_type = TransactionType.objects.get(type='Перевод')
+                form.instance.value = form.cleaned_data['value']
+                form.instance.credit_card_from = form.cleaned_data['credit_card_from']
+                form.instance.credit_card_to = credit_card_to
+                form.instance.transaction_status = transaction_status
+                messages.success(self.request, "Нельзя конвертировать данные валюты!")
+                return super().form_valid(form)
             else:
                 if currency_relation == currency_relation_direct:
                     coef = currency_relation.coefficient_buy
@@ -48,9 +69,11 @@ class MoneyTransferView(LoginRequiredMixin, CreateView):
                     coef = currency_relation.coefficient_sell
 
         if credit_card_from.bank_account.balance / coef < form.cleaned_data['value']:
-            transaction_status = TransactionStatus.objects.get(type='недостаточно средств')
+            transaction_status = TransactionStatus.objects.get(type='Недостаточно средств')
+            messages_text = 'Недостаточно средств'
         else:
-            transaction_status = TransactionStatus.objects.get(type='успешно')
+            transaction_status = TransactionStatus.objects.get(type='Успешно')
+            messages_text = 'Транзакция успешно произведена'
 
             # Update the balances of the credit cards
             credit_card_from.bank_account.balance -= form.cleaned_data['value'] * coef
@@ -63,12 +86,12 @@ class MoneyTransferView(LoginRequiredMixin, CreateView):
             credit_card_to.bank_account.save()
 
         form.instance.dt = datetime.datetime.now()
-        form.instance.transaction_type = TransactionType.objects.get(type='перевод')
+        form.instance.transaction_type = TransactionType.objects.get(type='Перевод')
         form.instance.value = form.cleaned_data['value']
         form.instance.credit_card_from = form.cleaned_data['credit_card_from']
         form.instance.credit_card_to = credit_card_to
         form.instance.transaction_status = transaction_status
-
+        messages.success(self.request, messages_text)
         return super().form_valid(form)
 
     def get_form_kwargs(self):

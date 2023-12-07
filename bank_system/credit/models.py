@@ -1,6 +1,8 @@
 from django.db import models
 from bank_account.models import BankAccount
 
+from bank_account.models import Currency
+
 COUNT = 0
 
 
@@ -19,6 +21,7 @@ class Credit(models.Model):
     min_amount = models.DecimalField(max_digits=12, decimal_places=2)
     max_amount = models.DecimalField(max_digits=12, decimal_places=2)
     percent = models.IntegerField()
+    currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
     type = models.ForeignKey(CreditType, on_delete=models.CASCADE)
 
     def __str__(self):

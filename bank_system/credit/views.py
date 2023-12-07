@@ -1,6 +1,7 @@
 import calendar
 import datetime
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -63,7 +64,7 @@ class CreateCreditView(LoginRequiredMixin, CreateView):
 
         credit = form.save()
         make_credit_transactions(credit)
-
+        messages.success(self.request, "Ваша заявка на кредит принята, ожидайте!")
         return super().form_valid(form)
 
     def get_form_kwargs(self):

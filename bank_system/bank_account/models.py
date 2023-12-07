@@ -47,7 +47,7 @@ class BankAccount(models.Model):
         decimal_places=2
     )
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
-    # account_type = models.ForeignKey(BankAccountType, on_delete=models.CASCADE)
+    account_type = models.ForeignKey(BankAccountType, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

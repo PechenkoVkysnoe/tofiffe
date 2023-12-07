@@ -3,24 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <title>Bank bank</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        header {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px;
+        }
+
+        header a {
+            text-decoration: none;
+            color: #000;
+            padding: 10px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+
+        header a:hover {
+            background-color: #f2f2f2;
+        }
+
+    </style>
 </head>
 <body>
-    <a href="{% url 'bank-account' %}">Go back to the cabinet</a>
+<header>
+    <a href="{% url 'bank-account' %}">Вернуться в личный кабинет</a>
     <br>
-    <a href="{% url 'make-transaction' %}">Make new transaction between credit card</a>
+    <a href="{% url 'make-transaction' %}">Создать перевод между картами</a>
+</header>
+<div style="margin: 10px">
+
+    <p>Ваши транзакции</p>
+    <table>
+        <tr>
+            <th>Дата</th>
+            <th>Тип транзакции</th>
+            <th>Значение</th>
+            <th>Номер отправителя</th>
+            <th>Номер получателя</th>
+            <th>Статус транзакции</th>
+        </tr>
+        {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.dt }}</td>
+                <td>{{ transaction.transaction_type }}</td>
+                <td>{{ transaction.value }}</td>
+                <td>{{ transaction.credit_card_from }}</td>
+                <td>{{ transaction.credit_card_to}}</td>
+                <td>{{ transaction.transaction_status}}</td>
+            </tr>
+        {% endfor %}
+    </table>
     <br>
-    <p>Your transaction</p>
-    <br>
-    {% for transaction in transactions %}
-  	    <div>
-            <p>Date: {{ transaction.dt }}</p>
-  	        <p>Type of transaction: {{ transaction.transaction_type }}</p>
-  	        <p>Value: {{ transaction.value }}</p>
-  	        <p>From: {{ transaction.credit_card_from }}</p>
-            <p>To: {{ transaction.credit_card_to }}</p>
-            <p>Transaction status: {{ transaction.transaction_status }}</p>
-  	    </div>
-        <br>
-  	{% endfor %}
+</div>
 </body>
 </html>

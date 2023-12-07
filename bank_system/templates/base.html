@@ -1,28 +1,76 @@
-{%load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Site</title>
-  </head>
-  <body>
-  	<header>
-  		{% if request.user.is_authenticated and request.user.telegram_id != 0 and request.user.confirmed %}
-  			<span>Hi {{ request.user.username | title }}</span>
-  			<a href="{% url 'logout' %}">Logout</a>
-            <a href="{% url 'bank-account' %}">Your cabinet</a>
-            <a href="{% url 'about_us' %}">О нас</a>
-  		{% elif request.user.is_authenticated %}
-		  	<span>Hi {{ request.user.username | title }}. Please, verify your identity.</span>
-			<a href="{% url 'logout' %}">Logout</a>
-		{% else %}
-			<a href="{% url 'login' %}">Login</a>
-  			<a href="{% url 'register' %}">Register</a>
-            <a href="{% url 'about_us' %}">О нас</a>
-  		{% endif %}
-  	</header>
-    <h1>Текущий курс валют</h1>
+<head>
+    <meta charset="UTF-8">
+    <title>Bank bank</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Add a new CSS class for the row */
+        .row-with-table {
+            display: flex;
+            align-items: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 20%;
+            float: right;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px;
+        }
+
+        header a {
+            text-decoration: none;
+            color: #000;
+            padding: 10px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+
+        header a:hover {
+            background-color: #f2f2f2;
+        }
+
+        .fancy-text {
+            font-size: 300px;
+            text-transform: uppercase;
+            letter-spacing: 20px;
+            text-shadow: 10px 10px 0px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+<header>
+    {% if request.user.is_authenticated and request.user.telegram_id != 0 and request.user.confirmed %}
+    <span>Hi {{ request.user.username | title }}</span>
+    <a href="{% url 'logout' %}">Выйти</a>
+    <a href="{% url 'bank-account' %}">Ваш личный кабинет</a>
+    <a href="{% url 'about_us' %}">О нас</a>
+    {% elif request.user.is_authenticated %}
+    <span>Hi {{ request.user.username | title }}. Please, verify your identity.</span>
+    <a href="{% url 'logout' %}">Выйти</a>
+    {% else %}
+    <a href="{% url 'login' %}">Login</a>
+    <a href="{% url 'register' %}">Register</a>
+    <a href="{% url 'about_us' %}">О нас</a>
+    {% endif %}
+</header>
+<div class="row-with-table">
+    <h1 class="fancy-text">Т О Ф И</h1>
     <table>
         <tr>
             <th>Валюта</th>
@@ -37,22 +85,19 @@
         </tr>
         {% endfor %}
     </table>
-  		<main>
-		{% if messages %}
-		<div class="messages">
-			{% for message in messages %}
-			<div class="alert {% if message.tags %}alert-{{ message.tags }}" {% endif %}>
-				{{ message }}
-			</div>
-			{% endfor %}
-		</div>
-		{% endif %}
-
-	</main>
-
-	{% block content%}
-	{% endblock content%}
-
+</div>
+<main>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}" {% endif %}>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</main>
+{% block content%}
+{% endblock content%}
 </body>
-
 </html>
