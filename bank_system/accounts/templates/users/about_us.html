@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Информация о банке</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px;
+        }
+
+        header a {
+            text-decoration: none;
+            color: #000;
+            padding: 10px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+
+        header a:hover {
+            background-color: #f2f2f2;
+        }
+
+        /* Добавленные стили для увеличения букв и создания эффекта 3D */
+        .fancy-text {
+            font-size: 420px;
+            text-transform: uppercase;
+            letter-spacing: 20px;
+            text-shadow: 10px 10px 0px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="{% url 'index' %}">Главная страница</a>
+        <a href="{% url 'partner' %}">Наши партнеры!</a>
+        <a href="{% url 'cards' %}">Наши карты!</a>
+        <a href="{% url 'credit' %}">Наши кредиты!</a>
+    </header>
+    <div style="margin: 10px">
+        <p>Банк ТОФИ - Театр Очень Фамильярного Идиотства</p>
+        <p>Адрес: Улица Пушкина, дом Колотушкина</p>
+        <p>Номер телефона: +375(29)2868321 </p>
+    </div>
+
+</body>
+</html>

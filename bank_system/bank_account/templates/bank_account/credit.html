@@ -1,0 +1,79 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank bank</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        header {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px;
+        }
+
+        header a {
+            text-decoration: none;
+            color: #000;
+            padding: 10px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+
+        header a:hover {
+            background-color: #f2f2f2;
+        }
+
+    </style>
+</head>
+<body>
+<header>
+    <a href="{% url 'bank-account' %}">Вернуться в личный кабинет</a>
+    <a href="{% url 'about_us' %}">О нас</a>
+</header>
+<div style="margin: 10px">
+
+    <p>Наши кредиты</p>
+    <table>
+        <tr>
+            <th>Название</th>
+            <th>Описание</th>
+            <th>Срок в месяцах</th>
+            <th>Проценты в год</th>
+            <th>Минимальная сумма</th>
+            <th>Максимальная сумма</th>
+            <th>Валюта</th>
+            <th>Тип</th>
+        </tr>
+        {% for credit in credits %}
+            <tr>
+                <td>{{ credit.name }}</td>
+                <td>{{ credit.description }}</td>
+                <td>{{ credit.period_in_month }}</td>
+                <td>{{ credit.percent }}</td>
+                <td>{{ credit.min_amount}}</td>
+                <td>{{ credit.max_amount}}</td>
+                <td>{{ credit.currency}}</td>
+                <td>{{ credit.type }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br>
+</div>
+</body>
+</html>

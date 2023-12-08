@@ -56,12 +56,12 @@
 <body>
 <header>
     {% if request.user.is_authenticated and request.user.telegram_id != 0 and request.user.confirmed %}
-    <span>Hi {{ request.user.username | title }}</span>
+    <span>Привет {{ request.user.username | title }}</span>
     <a href="{% url 'logout' %}">Выйти</a>
     <a href="{% url 'bank-account' %}">Ваш личный кабинет</a>
     <a href="{% url 'about_us' %}">О нас</a>
     {% elif request.user.is_authenticated %}
-    <span>Hi {{ request.user.username | title }}. Please, verify your identity.</span>
+    <span>Привет {{ request.user.username | title }}. Пожалуйста, подтвердите свою личность.</span>
     <a href="{% url 'logout' %}">Выйти</a>
     {% else %}
     <a href="{% url 'login' %}">Login</a>

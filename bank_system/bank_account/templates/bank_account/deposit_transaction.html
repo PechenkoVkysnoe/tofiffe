@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank bank</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        header {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px;
+        }
+
+        header a {
+            text-decoration: none;
+            color: #000;
+            padding: 10px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+
+        header a:hover {
+            background-color: #f2f2f2;
+        }
+
+    </style>
+</head>
+<body>
+<header>
+    <a href="{% url 'bank-account' %}">Вернуться в личный кабинет</a>
+    <br>
+    <a href="{% url 'my-credit' %}">Вернуться к кредитам</a>
+</header>
+<div style="margin: 10px">
+
+    <p>Ваши транзакции по кредиту</p>
+    <table>
+        <tr>
+            <th>Крайняя дата оплаты</th>
+            <th>Сколько осталось заплатить</th>
+        </tr>
+
+        {% for credit_transaction in credit_transactions %}
+            <tr>
+                <td>{{ credit_transaction.dt }}</td>
+                <td>{{ credit_transaction.amount }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br>
+</div>
+</body>
+</html>

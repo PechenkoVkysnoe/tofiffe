@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank bank</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        header {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px;
+        }
+
+        header a {
+            text-decoration: none;
+            color: #000;
+            padding: 10px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+
+        header a:hover {
+            background-color: #f2f2f2;
+        }
+
+        .popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            background-color: white;
+            border: 1px solid black;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a box shadow for a more prominent look */
+            border-radius: 5px;
+        }
+
+        .close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+<header>
+    <a href="{% url 'bank-account' %}">Вернуться в личный кабинет</a>
+    <a href="{% url 'make-deposit' %}">Создать заявку на депозит</a>
+</header>
+<div style="margin: 10px">
+
+    <p>Ваши депозиты</p>
+    <table>
+        <tr>
+            <th>Депозит</th>
+            <th>Банковский аккаунт с которого поступили средства</th>
+            <th>Сумма</th>
+            <th>Процент в год</th>
+            <th>Списать с депозита</th>
+        </tr>
+        {% for deposit in deposits %}
+            <tr>
+                <td>{{ deposit.deposit }}</td>
+                <td>{{ deposit.bank_account }}</td>
+                <td>{{ deposit.amount }}</td>
+                <td>{{ deposit.deposit.percent }}</td>
+                <td><a href="{% url 'pay-deposit' pk=deposit.id %}">Туть</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br>
+</div>
+{% if messages %}
+
+    {% for message in messages %}
+        <div class="popup">
+            <span class="close">&times;</span>
+            <p>{{ message }}</p>
+        </div>
+
+        <script>
+            var closeBtn = document.querySelector('.close');
+            var popup = document.querySelector('.popup');
+
+            closeBtn.addEventListener('click', function () {
+                popup.style.display = 'none';
+            });
+        </script>
+    {% endfor %}
+{% endif %}
+</body>
+</html>

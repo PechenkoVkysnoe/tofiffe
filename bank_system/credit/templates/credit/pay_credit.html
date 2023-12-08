@@ -1,0 +1,7 @@
+<body>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Оплатить кредит</button>
+  </form>
+</body>
