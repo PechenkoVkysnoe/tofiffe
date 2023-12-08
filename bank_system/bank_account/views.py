@@ -20,12 +20,13 @@ from bank_account.models import CardTypePrivileges
 
 from transaction.models import BankAccountTransaction
 
+
+from credit.models import UserCredit
+
 from bank_account.forms import PayDepositForm
 from deposit.models import UserDeposit
 
-from deposit.models import DepositTransaction
-
-from credit.models import UserCredit
+from deposit.models import DepositTransactionType
 
 
 class BankAccountView(LoginConfirmedRequiredMixin, View):
@@ -173,7 +174,7 @@ class CreditHistoryView(View):
         return render(request, 'bank_account/credit_transaction.html', context)
 
 
-class PayView(LoginConfirmedRequiredMixin, UpdateView):
+class PayCreditView(LoginConfirmedRequiredMixin, UpdateView):
     form_class = PayCreditForm
     model = UserCredit
     template_name = 'credit/pay_credit.html'
@@ -184,6 +185,9 @@ class PayView(LoginConfirmedRequiredMixin, UpdateView):
         amount = form.cleaned_data['amount']
         bank_account = BankAccount.objects.filter(name=form.cleaned_data['bank_account']).first()
         credit_transactions = CreditTransaction.objects.filter(credit=credit)
+        if bank_account.account_type.type == 'Сберегательный':
+            messages.success(self.request, "Нельзя списывать со сберегательного счета!")
+            return HttpResponseRedirect('/bank-account/my-credit/')
         if bank_account.balance < amount:
             messages.success(self.request, "На банковском счете недостаточно средств для оплаты!")
             return HttpResponseRedirect('/bank-account/my-credit/')
@@ -212,6 +216,7 @@ class PayView(LoginConfirmedRequiredMixin, UpdateView):
             if credit_transaction.amount != 0:
                 paid = False
         credit.paid = paid
+        credit.amount -= paid_amount
         credit.save()
         messages.success(self.request, "Плата по кредиту успешна произведена!")
         return HttpResponseRedirect('/bank-account/my-credit/')
@@ -222,73 +227,31 @@ class PayView(LoginConfirmedRequiredMixin, UpdateView):
         return kwargs
 
 
-class PayCreditView(LoginConfirmedRequiredMixin, View):
-    model = CreditTransaction
-    form_class = PayCreditForm
-    success_url = reverse_lazy('my-credit')
-    template_name = 'credit/pay_credit.html'
-    pk_url_kwarg = 'id'
+class PayDepositView(LoginConfirmedRequiredMixin, UpdateView):
+    form_class = PayDepositForm
+    model = UserDeposit
+    template_name = 'deposit/pay_deposit.html'
+    success_url = reverse_lazy('my-deposit')
+
     def form_valid(self, form):
-        credit = UserCredit.objects.filter(id=self.kwargs['id']).first()
+        deposit = UserDeposit.objects.filter(id=self.kwargs['pk']).first()
         amount = form.cleaned_data['amount']
         bank_account = BankAccount.objects.filter(name=form.cleaned_data['bank_account']).first()
-        credit_transactions = CreditTransaction.objects.filter(credit=credit)
         if bank_account.balance < amount:
-            messages.success(self.request, "На банковском счете недостаточно средств для оплаты!")
-            credit_transactions.save()
-            return super().form_valid(form)
-        if bank_account.currency != credit.credit.currency:
-            messages.success(self.request, "Не возможно оплатить кредит, разные валюты!")
-            return super().form_valid(form)
+            messages.success(self.request, "На депозите недостаточно средств для оплаты!")
+            return HttpResponseRedirect('/bank-account/my-deposit/')
+        if bank_account.currency != deposit.deposit.currency:
+            messages.success(self.request, "Не возможно снять с депозита, разные валюты!")
+            return HttpResponseRedirect('/bank-account/my-deposit/')
 
-        for credit_transaction in credit_transactions:
-            if credit_transaction.amount > 0:
-                if credit_transaction.amount > amount:
-                    credit_transaction.amount -= amount
-                    amount = 0
-                else:
-                    credit_transaction.amount = 0
-                    amount -= credit_transaction.amount
-            credit_transaction.save()
-        paid = True
-        for credit_transaction in credit_transactions:
-            if credit_transaction.amount != 0:
-                paid = False
-        credit.paid = paid
-        credit.save()
-        return super().form_valid(form)
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
-
-
-class DepositHistoryView(View):
-    def get(self, request, *args, **kwargs):
-        id = kwargs.get('id')
-        deposit_transactions = DepositTransaction.objects.filter(deposit__id=id)
-        context = {
-            'deposit_transactions': deposit_transactions,
-        }
-        return render(request, 'bank_account/deposit_transaction.html', context)
-
-
-class PayDepositView(LoginConfirmedRequiredMixin, CreateView):
-    model = UserDeposit
-    form_class = PayDepositForm
-    success_url = reverse_lazy('my-deposit')
-    template_name = 'bank_account/make-bank-account.html'
-
-    def form_valid(self, form):
-        CreditTransaction.objects.filter(pk=self.kwargs['pk'])
-        credit_transaction = self.get_object()
-        # Получаем введенную сумму из формы
-        amount = form.cleaned_data['amount']
-        # Уменьшаем значение amount у выбранного CreditTransaction
-        credit_transaction.amount -= amount
-        credit_transaction.save()
-        return super().form_valid(form)
+        bank_account.balance += amount
+        bank_account.save()
+        deposit.amount -= amount
+        deposit.save()
+        # deposit.type = DepositTransactionType.objects.filter(type='Списание').first()
+        # deposit.save()
+        messages.success(self.request, "Деньги успешно списаны с депозита!")
+        return HttpResponseRedirect('/bank-account/my-deposit/')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

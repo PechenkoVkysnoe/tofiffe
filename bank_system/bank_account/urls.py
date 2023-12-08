@@ -12,12 +12,9 @@ from bank_account.views import (
     CreditHistoryView,
     BankAccoundTransactionView,
     PayDepositView,
-    DepositHistoryView
 )
 from credit.views import CreateCreditView, MyCreditView
 from deposit.views import CreateDepositView, MyDepositView
-
-from bank_account.views import PayView
 
 urlpatterns = [
     path('', BankAccountView.as_view(), name='bank-account'),
@@ -33,12 +30,12 @@ urlpatterns = [
 
     path('my-credit/', MyCreditView.as_view(), name='my-credit'),
     path('my-credit/make-credit/', CreateCreditView.as_view(), name='make-credit'),
-    path('my-credit/<slug:pk>/pay-credit/', PayView.as_view(), name='pay-credit'),
+    path('my-credit/<slug:pk>/pay-credit/', PayCreditView.as_view(), name='pay-credit'),
 
     path('my-credit/history/<int:id>/', CreditHistoryView.as_view(), name='credit-history'),
 
     path('my-deposit/', MyDepositView.as_view(), name='my-deposit'),
     path('my-deposit/make-deposit/', CreateDepositView.as_view(), name='make-deposit'),
-    path('my-deposit/pay-deposit/<int:id>/', PayDepositView.as_view(), name='pay-deposit'),
-    path('my-deposit/history/<int:id>/', DepositHistoryView.as_view(), name='deposit-history'),
+    path('my-deposit/<slug:pk>/pay-deposit/', PayDepositView.as_view(), name='pay-deposit'),
+    # path('my-deposit/history/<int:id>/', DepositHistoryView.as_view(), name='deposit-history'),
 ]
