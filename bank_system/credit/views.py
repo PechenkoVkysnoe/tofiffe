@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic.edit import CreateView
 
-from transaction.models import Transaction, TransactionStatus, TransactionType
+from transaction.models import CardTransaction, TransactionStatus, TransactionType
 
 
 from credit.forms import CreateCreditForm
@@ -19,6 +19,10 @@ from credit.models import CreditTransaction, CreditType
 
 from credit.models import UserCredit
 
+from bank_account.models import BankAccount
+
+from credit.models import Credit
+
 
 def make_credit_transactions(credit):
     if credit.credit.type == CreditType.objects.get(type='Аннуитетный'):
@@ -27,15 +31,15 @@ def make_credit_transactions(credit):
         n = credit.credit.period_in_month
         k = (i / 1200 * ((1 + i / 1200) ** n)) / ((1 + i / 1200) ** n - 1)
         current_date = datetime.datetime.now()
-        first = current_date.replace(day=1, month=current_date.month)
-        for j in range(credit.credit.period_in_month):
-            # я хз как прибавлять ровно месяц по другому
-            sum_mont = 0
-            for h in range(first.month, first.month + j + 1):
-                _, month_days = calendar.monthrange(first.year, i)
-                sum_mont += month_days
+        mouth_now = current_date.month
+        year_now = current_date.year
+        for _ in range(1, credit.credit.period_in_month + 1):
+            mouth_now += 1
+            if mouth_now == 13:
+                mouth_now = 1
+                year_now += 1
             CreditTransaction.objects.create(
-                dt=first + datetime.timedelta(days=sum_mont),
+                dt=datetime.datetime(year_now, mouth_now, 1, 0, 0, 1),
                 amount=float(credit.amount) * k,
                 credit=credit
             )
@@ -51,14 +55,21 @@ class MyCreditView(View):
 
 
 class CreateCreditView(LoginRequiredMixin, CreateView):
-    model = Transaction
+    model = CardTransaction
     form_class = CreateCreditForm
     template_name = 'credit/make_credit.html'
-    success_url = reverse_lazy('bank-account')
+    success_url = reverse_lazy('my-credit')
 
     def form_valid(self, form):
-        form.instance.credit = form.cleaned_data['credit']
-        form.instance.bank_account = form.cleaned_data['bank_account']
+        credit = form.cleaned_data['credit']
+        bank_account = form.cleaned_data['bank_account']
+
+        if BankAccount.objects.filter(name=bank_account).first().currency != Credit.objects.filter(name=credit).first().currency:
+
+            messages.success(self.request, "Ваша заявка на кредит НЕ принята. Валюты банковского счета и кредита разные!")
+            return super().form_valid(form)
+        form.instance.credit = credit
+        form.instance.bank_account = bank_account
         form.instance.status = CreditStatus.objects.get(name='В ожидании')
         form.instance.amount = form.cleaned_data['amount']
 

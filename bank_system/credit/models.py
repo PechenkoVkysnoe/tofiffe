@@ -3,8 +3,7 @@ from bank_account.models import BankAccount
 
 from bank_account.models import Currency
 
-COUNT = 0
-
+COUNT = {}
 
 class CreditType(models.Model):
     type = models.CharField(max_length=255)
@@ -41,18 +40,20 @@ class UserCredit(models.Model):
     bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE)
     status = models.ForeignKey(CreditStatus, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
+    paid = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
 
     def save(self, *args, **kwargs):
-        global COUNT
-
-        if self.status.name == 'Одобрено' and not COUNT:
-            COUNT += 1
-            self.bank_account.balance += self.amount
-            self.bank_account.save()
-        super().save(*args, **kwargs)
+        try:
+            if self.status.name == 'Одобрено' and self.id not in COUNT:
+                COUNT[self.id] = 1
+                self.bank_account.balance += self.amount
+                self.bank_account.save()
+            super().save(*args, **kwargs)
+        except:
+            pass
 
 
 class CreditTransaction(models.Model):

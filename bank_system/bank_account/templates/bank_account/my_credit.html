@@ -37,13 +37,32 @@
             background-color: #f2f2f2;
         }
 
+        .popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            background-color: white;
+            border: 1px solid black;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a box shadow for a more prominent look */
+            border-radius: 5px;
+        }
+
+        .close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
 <header>
     <a href="{% url 'bank-account' %}">Вернуться в личный кабинет</a>
     <a href="{% url 'make-credit' %}">Создать заявку на кредит</a>
-    <a href="{% url 'pay-credit' %}">Оплатить свои кредиты</a>
 </header>
 <div style="margin: 10px">
 
@@ -56,6 +75,7 @@
             <th>Сумма</th>
             <th>Период в месяцах</th>
             <th>Процент в год</th>
+            <th>Статус оплаты</th>
             <th>История кредита</th>
             <th>Оплата кредита</th>
         </tr>
@@ -67,20 +87,47 @@
                 <td>{{ credit.amount }}</td>
                 <td>{{ credit.credit.period_in_month }}</td>
                 <td>{{ credit.credit.percent }}</td>
+                {% if credit.paid %}
+                    <td>Кредит выплачен</td>
+                {% else %}
+                    <td>Кредит непогашен</td>
+                {% endif %}
                 {% if credit.status.name == 'Одобрено' %}
-                    <td><a href="{% url 'credit-history' id=credit.id %}">Туть</a></td>
+                    <td><a href="{% url 'credit-history' credit.id %}">Туть</a></td>
                 {% else %}
                     <td>Ожидайте подтверждения кредита</td>
                 {% endif %}
                 {% if credit.status.name == 'Одобрено' %}
-                    <td><a href="{% url 'pay-credit' %}">Туть</a></td>
+                    {% if not credit.paid %}
+                        <td><a href="{% url 'pay-credit' pk=credit.id %}">Туть</a></td>
+                    {% endif %}
+
                 {% else %}
                     <td>Ожидайте подтверждения кредита</td>
                 {% endif %}
+
             </tr>
         {% endfor %}
     </table>
     <br>
 </div>
+{% if messages %}
+
+    {% for message in messages %}
+        <div class="popup">
+            <span class="close">&times;</span>
+            <p>{{ message }}</p>
+        </div>
+
+        <script>
+            var closeBtn = document.querySelector('.close');
+            var popup = document.querySelector('.popup');
+
+            closeBtn.addEventListener('click', function () {
+                popup.style.display = 'none';
+            });
+        </script>
+    {% endfor %}
+{% endif %}
 </body>
 </html>

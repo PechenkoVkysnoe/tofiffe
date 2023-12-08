@@ -1,3 +1,5 @@
+import threading
+from time import sleep
 from functools import wraps
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
@@ -13,7 +15,6 @@ from accounts.utils import verify_telegram_authentication
 from accounts.models import User
 
 TELEGRAM_BOT_TOKEN = '6510492757:AAGSxkG85ynW3C4EFN0bKjIvFedE_0kIKRE'
-
 
 
 class Index(View):

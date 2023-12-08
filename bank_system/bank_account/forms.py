@@ -5,6 +5,8 @@ from bank_account.models import BankAccountType
 
 from credit.models import CreditTransaction
 
+from deposit.models import UserDeposit
+
 
 class MakeBankAccountForm(forms.ModelForm):
     currency = forms.ModelChoiceField(queryset=Currency.objects.all())
@@ -28,10 +30,23 @@ class MakeCreditCardForm(forms.ModelForm):
 
 
 class PayCreditForm(forms.ModelForm):
+    bank_account = forms.ModelChoiceField(queryset=BankAccount.objects.none())
+    amount = forms.DecimalField(initial=0)
     class Meta:
         model = CreditTransaction
+        fields = ['amount', 'bank_account']
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['bank_account'].queryset = BankAccount.objects.filter(user=user)
+
+
+class PayDepositForm(forms.ModelForm):
+    class Meta:
+        model = UserDeposit
         fields = ['amount']
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['bank_account'].queryset = BankAccount.objects.filter(user=user)
+        self.fields['deposit'].queryset = UserDeposit.objects.filter(user=user)

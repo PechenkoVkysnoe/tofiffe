@@ -36,18 +36,36 @@
         header a:hover {
             background-color: #f2f2f2;
         }
+        .popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            background-color: white;
+            border: 1px solid black;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a box shadow for a more prominent look */
+            border-radius: 5px;
+        }
 
+        .close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 <header>
     <a href="{% url 'bank-account' %}">Вернуться в личный кабинет</a>
-    <br>
-    <a href="{% url 'make-transaction' %}">Создать перевод между картами</a>
+    <a href="{% url 'make-card-transaction' %}">Создать перевод между картами</a>
+    <a href="{% url 'make-bank-account-transaction' %}">Создать перевод между банковскими счетами</a>
 </header>
 <div style="margin: 10px">
 
-    <p>Ваши транзакции</p>
+    <p>Транзакции по картам которые Вы совершили</p>
     <table>
         <tr>
             <th>Дата</th>
@@ -57,7 +75,7 @@
             <th>Номер получателя</th>
             <th>Статус транзакции</th>
         </tr>
-        {% for transaction in transactions %}
+        {% for transaction in transactions_card %}
             <tr>
                 <td>{{ transaction.dt }}</td>
                 <td>{{ transaction.transaction_type }}</td>
@@ -69,6 +87,45 @@
         {% endfor %}
     </table>
     <br>
+    <p>Транзакции по счетам которые Вы совершили</p>
+    <table>
+        <tr>
+            <th>Дата</th>
+            <th>Тип транзакции</th>
+            <th>Значение</th>
+            <th>Номер отправителя</th>
+            <th>Номер получателя</th>
+            <th>Статус транзакции</th>
+        </tr>
+        {% for transaction in transactions_account %}
+            <tr>
+                <td>{{ transaction.dt }}</td>
+                <td>{{ transaction.transaction_type }}</td>
+                <td>{{ transaction.value }}</td>
+                <td>{{ transaction.bank_account_from }}</td>
+                <td>{{ transaction.bank_account_to}}</td>
+                <td>{{ transaction.transaction_status}}</td>
+            </tr>
+        {% endfor %}
+    </table>
 </div>
+{% if messages %}
+
+    {% for message in messages %}
+        <div class="popup">
+            <span class="close">&times;</span>
+            <p>{{ message }}</p>
+        </div>
+
+        <script>
+            var closeBtn = document.querySelector('.close');
+            var popup = document.querySelector('.popup');
+
+            closeBtn.addEventListener('click', function () {
+                popup.style.display = 'none';
+            });
+        </script>
+    {% endfor %}
+{% endif %}
 </body>
 </html>

@@ -36,6 +36,26 @@
         header a:hover {
             background-color: #f2f2f2;
         }
+
+        .popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            background-color: white;
+            border: 1px solid black;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a box shadow for a more prominent look */
+            border-radius: 5px;
+        }
+
+        .close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -53,6 +73,7 @@
             <th>Баланс</th>
             <th>Валюта</th>
             <th>Тип</th>
+            <th>Транзакции</th>
         </tr>
         {% for bank_account in bank_accounts %}
             <tr>
@@ -60,10 +81,29 @@
                 <td>{{ bank_account.balance }}</td>
                 <td>{{ bank_account.currency }}</td>
                 <td>{{ bank_account.account_type }}</td>
+                <td><a href="{% url 'bank-account-transaction' number=bank_account.name %}">Ваши транзакции</a></td>
             </tr>
         {% endfor %}
     </table>
     <br>
 </div>
+{% if messages %}
+
+    {% for message in messages %}
+        <div class="popup">
+            <span class="close">&times;</span>
+            <p>{{ message }}</p>
+        </div>
+
+        <script>
+            var closeBtn = document.querySelector('.close');
+            var popup = document.querySelector('.popup');
+
+            closeBtn.addEventListener('click', function () {
+                popup.style.display = 'none';
+            });
+        </script>
+    {% endfor %}
+{% endif %}
 </body>
 </html>

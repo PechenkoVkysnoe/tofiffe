@@ -2,7 +2,7 @@ from django.urls import path
 from accounts import views
 from bank_account.views import AboutUsView, PartnerView
 
-from bank_account.views import CreditView
+from bank_account.views import CreditView, CardTypePrivilegesView
 
 urlpatterns = [
     path('', views.Index.as_view(), name='index'),
@@ -12,6 +12,7 @@ urlpatterns = [
     path('register/telegram', views.sign_up_telegram, name='register_telegram'),
     path('pather', PartnerView.as_view(), name='partner'),
     path('credit', CreditView.as_view(), name='credit'),
+    path('cards', CardTypePrivilegesView.as_view(), name='cards'),
     path('about_us', AboutUsView.as_view(), name='about_us'),
     path('await_confirm/', views.AwaitConfirm.as_view(), name='await_confirm')
 ]
