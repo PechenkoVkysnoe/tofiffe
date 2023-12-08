@@ -65,14 +65,14 @@ class MakeCreditCardViewTest(TestCase):
         }
         form = MakeBankAccountForm(data=data)
         self.assertTrue(form.is_valid())
-        # response = MakeCreditCard.form_valid(form=request)
-        # self.assertEqual(response.status_code, 302)  # Redirect after successful form submission
-        # self.assertEqual(CreditCard.objects.count(), 1)
-        # credit_card = CreditCard.objects.first()
-        # self.assertEqual(credit_card.owner_name, 'JOHN DOE')
-        # self.assertIsNotNone(credit_card.number)
-        # self.assertIsNotNone(credit_card.cvv)
-        # self.assertIsNotNone(credit_card.date_to)
+        response = MakeCreditCard.form_valid(form=request)
+        self.assertEqual(response.status_code, 302)  # Redirect after successful form submission
+        self.assertEqual(CreditCard.objects.count(), 1)
+        credit_card = CreditCard.objects.first()
+        self.assertEqual(credit_card.owner_name, 'JOHN DOE')
+        self.assertIsNotNone(credit_card.number)
+        self.assertIsNotNone(credit_card.cvv)
+        self.assertIsNotNone(credit_card.date_to)
     #
     # def test_get_form_kwargs(self):
     #     request = self.factory.get(self.url)
